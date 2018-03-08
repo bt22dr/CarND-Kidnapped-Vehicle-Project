@@ -50,6 +50,8 @@ public:
 	// Destructor
 	~ParticleFilter() {}
 
+    void setNumParticles(unsigned int num);
+    
 	/**
 	 * init Initializes particle filter by initializing particles to Gaussian
 	 *   distribution around first position and all the weights to 1.
