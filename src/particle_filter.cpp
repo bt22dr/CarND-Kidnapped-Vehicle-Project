@@ -57,11 +57,18 @@ void ParticleFilter::prediction(double delta_t, double std_pos[], double velocit
   double curr_theta = 0.0;
   
   default_random_engine gen;
+  //std::cout << "PREDICT: " << std::endl;
   //std::cout << "control: " << velocity << ", " << yaw_rate << std::endl;
   for (int i = 0; i < num_particles; i++) {
-    curr_x = particles[i].x + velocity / yaw_rate * (sin(particles[i].theta + yaw_rate * delta_t) - sin(particles[i].theta));
-    curr_y = particles[i].y + velocity / yaw_rate * (cos(particles[i].theta) - cos(particles[i].theta + yaw_rate * delta_t));
-    curr_theta = particles[i].theta + yaw_rate * delta_t;
+    if (abs(yaw_rate) < __DBL_EPSILON__) {
+      curr_x = particles[i].x + velocity * delta_t * cos(particles[i].theta);
+      curr_y = particles[i].y + velocity * delta_t * sin(particles[i].theta);
+      curr_theta = particles[i].theta;
+    } else {
+      curr_x = particles[i].x + velocity / yaw_rate * (sin(particles[i].theta + yaw_rate * delta_t) - sin(particles[i].theta));
+      curr_y = particles[i].y + velocity / yaw_rate * (cos(particles[i].theta) - cos(particles[i].theta + yaw_rate * delta_t));
+      curr_theta = particles[i].theta + yaw_rate * delta_t;
+    }
     
     //std::cout << "predict: " << curr_x << ", " << curr_y << ", " << curr_theta << std::endl;
     
@@ -143,6 +150,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
       LandmarkObs obj;
       obj.x = xm;
       obj.y = ym;
+      obj.id = -1;
       transformed_observation.push_back(obj);
     }
     
